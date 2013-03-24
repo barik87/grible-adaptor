@@ -30,10 +30,6 @@ public class DataTable {
 		initializeSQLDriver();
 	}
 
-	public List<HashMap<String, String>> getGeneralParameters() {
-		return getGeneralTable();
-	}
-
 	public HashMap<String, String> getPreconditionsTable() {
 		return getOneRowTable("precondition");
 	}
@@ -67,7 +63,7 @@ public class DataTable {
 		return result;
 	}
 
-	private List<HashMap<String, String>> getGeneralTable() {
+	public List<HashMap<String, String>> getGeneralTable() {
 		return getValuesFromDataCenter("table");
 	}
 
