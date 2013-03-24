@@ -30,7 +30,7 @@ public class DataStorage {
 				Exception pineException = new Exception("DataStorage exception: " + e.getMessage()
 						+ ". Happened during creating a descriptor: " + type.toString() + " # " + (i + 1));
 				pineException.setStackTrace(e.getStackTrace());
-				Settings.getInstance().getErrorsHandler().onAdaptorFail(pineException);
+				PineSettings.getErrorsHandler().onAdaptorFail(pineException);
 			}
 			result.add(descriptor);
 		}
@@ -67,7 +67,7 @@ public class DataStorage {
 							+ ". Happened during creating a descriptor: " + type.toString() + " # "
 							+ iterationNumbers[i]);
 					pineException.setStackTrace(e.getStackTrace());
-					Settings.getInstance().getErrorsHandler().onAdaptorFail(pineException);
+					PineSettings.getErrorsHandler().onAdaptorFail(pineException);
 				}
 				result.add(descriptor);
 			}
@@ -87,7 +87,7 @@ public class DataStorage {
 								+ ". Happened during creating a descriptor: " + type.toString() + " # "
 								+ iterationNumbers[i]);
 						pineException.setStackTrace(e.getStackTrace());
-						Settings.getInstance().getErrorsHandler().onAdaptorFail(pineException);
+						PineSettings.getErrorsHandler().onAdaptorFail(pineException);
 					}
 					result.add(descriptor);
 				}

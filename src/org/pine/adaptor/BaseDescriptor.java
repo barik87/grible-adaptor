@@ -31,7 +31,7 @@ public abstract class BaseDescriptor {
 		if (data != null) {
 			if (!data.containsKey(key)) {
 				Exception e = new Exception("Descriptor error: key '" + key + "' not found. HashMap: " + data + ".");
-				Settings.getInstance().getErrorsHandler().onAdaptorFail(e);
+				PineSettings.getErrorsHandler().onAdaptorFail(e);
 			}
 			return data.get(key);
 		}
@@ -42,7 +42,7 @@ public abstract class BaseDescriptor {
 		if (data != null) {
 			if (!data.containsKey(key)) {
 				Exception e = new Exception("Descriptor error: key '" + key + "' not found. HashMap: " + data + ".");
-				Settings.getInstance().getErrorsHandler().onAdaptorFail(e);
+				PineSettings.getErrorsHandler().onAdaptorFail(e);
 			}
 			return Boolean.parseBoolean(data.get(key));
 		}
@@ -53,7 +53,7 @@ public abstract class BaseDescriptor {
 		if (data != null) {
 			if (!data.containsKey(key)) {
 				Exception e = new Exception("Descriptor error: key '" + key + "' not found. HashMap: " + data + ".");
-				Settings.getInstance().getErrorsHandler().onAdaptorFail(e);
+				PineSettings.getErrorsHandler().onAdaptorFail(e);
 			}
 			if (StringUtils.isNumeric(data.get(key))) {
 				return Integer.parseInt(data.get(key));

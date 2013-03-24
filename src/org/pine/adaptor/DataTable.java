@@ -26,7 +26,7 @@ public class DataTable {
 
 	public DataTable(String name) {
 		this.tableName = name;
-		this.productName = Settings.getInstance().getProductName();
+		this.productName = PineSettings.getProductName();
 		initializeSQLDriver();
 	}
 
@@ -58,7 +58,7 @@ public class DataTable {
 			rs.close();
 			stmt.close();
 		} catch (SQLException e) {
-			Settings.getInstance().getErrorsHandler().onAdaptorFail(e);
+			PineSettings.getErrorsHandler().onAdaptorFail(e);
 		}
 		return result;
 	}
@@ -119,17 +119,17 @@ public class DataTable {
 			rs.close();
 			stmt.close();
 		} catch (SQLException e) {
-			Settings.getInstance().getErrorsHandler().onAdaptorFail(e);
+			PineSettings.getErrorsHandler().onAdaptorFail(e);
 		}
 		return result;
 	}
 
 	private Connection getConnection() throws SQLException {
-		String dbhost = Settings.getInstance().getDbHost();
-		String dbport = Settings.getInstance().getDbPort();
-		String dbName = Settings.getInstance().getDbName();
-		String dblogin = Settings.getInstance().getDbLogin();
-		String dbpswd = Settings.getInstance().getDbPswd();
+		String dbhost = PineSettings.getDbHost();
+		String dbport = PineSettings.getDbPort();
+		String dbName = PineSettings.getDbName();
+		String dblogin = PineSettings.getDbLogin();
+		String dbpswd = PineSettings.getDbPswd();
 
 		Connection conn = DriverManager.getConnection("jdbc:postgresql://" + dbhost + ":" + dbport + "/" + dbName,
 				dblogin, dbpswd);
@@ -140,7 +140,7 @@ public class DataTable {
 		try {
 			Class.forName("org.postgresql.Driver").newInstance();
 		} catch (Exception e) {
-			Settings.getInstance().getErrorsHandler().onAdaptorFail(e);
+			PineSettings.getErrorsHandler().onAdaptorFail(e);
 		}
 	}
 }
