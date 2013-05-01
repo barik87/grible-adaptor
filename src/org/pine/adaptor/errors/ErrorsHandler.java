@@ -10,6 +10,12 @@
  ******************************************************************************/
 package org.pine.adaptor.errors;
 
+/**
+ * The interface for the handlers of exceptions that occur in the pine adaptor.
+ * 
+ * @author Maksym Barvinskyi
+ * 
+ */
 public interface ErrorsHandler {
 	public abstract void onAdaptorFail(Exception e);
 }

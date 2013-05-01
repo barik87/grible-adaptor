@@ -20,20 +20,36 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class DataTable {
+/**
+ * Class that represents Test Table entity from Pine.
+ * 
+ * @author Maksym Barvinskyi
+ *
+ */
+public class TestTable {
 	private String tableName;
 	private String productName;
 
-	public DataTable(String name) {
+	public TestTable(String name) {
 		this.tableName = name;
 		this.productName = PineSettings.getProductName();
 		initializeSQLDriver();
 	}
 
+	/**
+	 * Retrieves data from Preconditions sheet.
+	 * 
+	 * @return HashMap<ParameterName, ParameterValue>.
+	 */
 	public HashMap<String, String> getPreconditionsTable() {
 		return getOneRowTable("precondition");
 	}
 
+	/**
+	 * Retrieves data from Postconditions sheet.
+	 * 
+	 * @return HashMap<ParameterName, ParameterValue>.
+	 */
 	public HashMap<String, String> getPostconditionsTable() {
 		return getOneRowTable("postcondition");
 	}
@@ -63,6 +79,11 @@ public class DataTable {
 		return result;
 	}
 
+	/**
+	 * Retrieves data from General sheet.
+	 * 
+	 * @return ArrayList of HashMap<ParameterName, ParameterValue>.
+	 */
 	public List<HashMap<String, String>> getGeneralTable() {
 		return getValuesFromDataCenter("table");
 	}
@@ -120,6 +141,10 @@ public class DataTable {
 			stmt.close();
 		} catch (SQLException e) {
 			PineSettings.getErrorsHandler().onAdaptorFail(e);
+		}
+		if (result.isEmpty()) {
+			String message = "Pine error: " + entityType + " '" + tableName + "' is missing.";
+			PineSettings.getErrorsHandler().onAdaptorFail(new Exception(message));
 		}
 		return result;
 	}

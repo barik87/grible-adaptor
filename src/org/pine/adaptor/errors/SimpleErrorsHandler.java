@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.pine.adaptor.errors;
 
+/**
+ * Default handler of exceptions that occur in the pine adaptor. It will simply print the stacktrace to the console.
+ * 
+ * @author Maksym Barvinskyi
+ */
 public class SimpleErrorsHandler implements ErrorsHandler {
 
 	@Override

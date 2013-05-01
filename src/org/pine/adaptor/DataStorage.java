@@ -15,10 +15,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Class that contains methods for retrieving data from pine Data Storages and transform it to descriptors objects.
+ * 
+ * @author Maksym Barvinskyi
+ * 
+ */
 public class DataStorage {
 
+	/**
+	 * Retrieves data from pine Data Storage and transforms it to descriptors objects.
+	 * 
+	 * @param type
+	 *            - class of the descriptor (i.e. UserInfo.class);
+	 * @return ArrayList of all the specified descriptors found in the storage.
+	 */
 	public static <T> List<T> getDescriptors(Class<T> type) {
-		DataTable dataStorage = new DataTable(type.getSimpleName());
+		TestTable dataStorage = new TestTable(type.getSimpleName());
 		List<T> result = new ArrayList<T>();
 		List<HashMap<String, String>> rows = dataStorage.getDataStorageValues();
 		for (int i = 0; i < rows.size(); i++) {
@@ -37,10 +50,31 @@ public class DataStorage {
 		return result;
 	}
 
+	/**
+	 * Retrieves data from pine Data Storage and transforms it to descriptors objects.
+	 * 
+	 * @param type
+	 *            - class of the descriptor (i.e. UserInfo.class);
+	 * @param indexes
+	 *            - rows indexes of the descriptors to retrieve (i.e. "5", "1;2;2;7"); "0" index in multiple indexes
+	 *            ("1;0;7") is not allowed;
+	 * @return ArrayList of the descriptors with specified row numbers found in the storage.
+	 */
 	public static <T> List<T> getDescriptors(Class<T> type, String indexes) {
 		return getDescriptors(type, indexes, false);
 	}
 
+	/**
+	 * Retrieves data from pine Data Storage and transforms it to descriptors objects.
+	 * 
+	 * @param type
+	 *            - class of the descriptor (i.e. UserInfo.class);
+	 * @param indexes
+	 *            - rows indexes of the descriptors to retrieve (i.e. "5", "1;2;2;7");
+	 * @param allowEmpty
+	 *            - specifies whether "0" index in multiple indexes (like "1;0;7") is allowed;
+	 * @return ArrayList of the descriptors with specified row numbers found in the storage.
+	 */
 	public static <T> List<T> getDescriptors(Class<T> type, String indexes, boolean allowEmpty) {
 		List<T> result = new ArrayList<T>();
 		if (allowEmpty) {
@@ -49,7 +83,7 @@ public class DataStorage {
 				iterationNumbers = getIntArrayFromString(indexes, ";");
 			}
 
-			DataTable dataStorage = new DataTable(type.getSimpleName());
+			TestTable dataStorage = new TestTable(type.getSimpleName());
 
 			List<HashMap<String, String>> rows = dataStorage.getDataStorageValues();
 			for (int i = 0; i < iterationNumbers.length; i++) {
@@ -74,7 +108,7 @@ public class DataStorage {
 		} else {
 			if ((!("0").equals(indexes)) && (indexes != null)) {
 				int[] iterationNumbers = getIntArrayFromString(indexes, ";");
-				DataTable dataStorage = new DataTable(type.getSimpleName());
+				TestTable dataStorage = new TestTable(type.getSimpleName());
 
 				List<HashMap<String, String>> rows = dataStorage.getDataStorageValues();
 				for (int i = 0; i < iterationNumbers.length; i++) {
@@ -96,6 +130,15 @@ public class DataStorage {
 		return result;
 	}
 
+	/**
+	 * Retrieves data from pine Data Storage and transforms it to the single descriptor object.
+	 * 
+	 * @param type
+	 *            - class of the descriptor (i.e. UserInfo.class);
+	 * @param index
+	 *            - row index of the descriptor to retrieve (i.e. "1", "5"); must be greater than 0;
+	 * @return ArrayList of the descriptor with specified row number found in the storage.
+	 */
 	public static <T> T getDescriptor(Class<T> type, String index) {
 		List<T> descriptors = getDescriptors(type, index, true);
 		return descriptors.get(0);
@@ -112,5 +155,4 @@ public class DataStorage {
 		}
 		return resultArray;
 	}
-
 }

@@ -19,6 +19,12 @@ import nu.xom.Element;
 import org.pine.adaptor.errors.ErrorsHandler;
 import org.pine.adaptor.errors.SimpleErrorsHandler;
 
+/**
+ * Class that holds pine adaptor settings.
+ * 
+ * @author Maksym Barvinskyi
+ * 
+ */
 public class PineSettings {
 	private static ErrorsHandler errorsHandler;
 	private static String productName;
@@ -28,6 +34,12 @@ public class PineSettings {
 	private static String dblogin;
 	private static String dbpswd;
 
+	/**
+	 * Initializes pine adaptor based on data values from pine.xml.
+	 * 
+	 * @param configFilePath
+	 *            - path to pine.xml file (relative or absolute);
+	 */
 	public static void init(String configFilePath) {
 		try {
 			Builder parser = new Builder();
@@ -53,14 +65,28 @@ public class PineSettings {
 		return errorsHandler;
 	}
 
+	/**
+	 * Sets the handler for the errors that occur in the pine adaptor.
+	 * 
+	 * @param errorsHandler
+	 *            - class that implements ErrorsHandler interface.
+	 */
 	public static void setErrorsHandler(ErrorsHandler errorsHandler) {
 		PineSettings.errorsHandler = errorsHandler;
 	}
 
+	/**
+	 * Gets the Product name that was set by setProductName(String productName).
+	 */
 	public static String getProductName() {
 		return productName;
 	}
 
+	/**
+	 * Sets the Product name. Must be equal to one in Pine.
+	 * 
+	 * @param productName
+	 */
 	public static void setProductName(String productName) {
 		PineSettings.productName = productName;
 	}

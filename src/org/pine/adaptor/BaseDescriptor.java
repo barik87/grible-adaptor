@@ -14,6 +14,12 @@ import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Abstract template for descriptors objects. Contains methods for transforming data from HashMap to the descriptor.
+ * 
+ * @author Maksym Barvinskyi
+ * 
+ */
 public abstract class BaseDescriptor {
 	private HashMap<String, String> data;
 	private boolean isNotEmpty;
@@ -27,7 +33,11 @@ public abstract class BaseDescriptor {
 		}
 	}
 
-	public String getString(String key) {
+	private void setNotEmpty(boolean isNotEmpty) {
+		this.isNotEmpty = isNotEmpty;
+	}
+
+	protected String getString(String key) {
 		if (data != null) {
 			if (!data.containsKey(key)) {
 				Exception e = new Exception("Descriptor error: key '" + key + "' not found. HashMap: " + data + ".");
@@ -38,7 +48,7 @@ public abstract class BaseDescriptor {
 		return null;
 	}
 
-	public boolean getBoolean(String key) {
+	protected boolean getBoolean(String key) {
 		if (data != null) {
 			if (!data.containsKey(key)) {
 				Exception e = new Exception("Descriptor error: key '" + key + "' not found. HashMap: " + data + ".");
@@ -49,7 +59,7 @@ public abstract class BaseDescriptor {
 		return false;
 	}
 
-	public int getInt(String key) {
+	protected int getInt(String key) {
 		if (data != null) {
 			if (!data.containsKey(key)) {
 				Exception e = new Exception("Descriptor error: key '" + key + "' not found. HashMap: " + data + ".");
@@ -62,11 +72,13 @@ public abstract class BaseDescriptor {
 		return 0;
 	}
 
+	/**
+	 * Is the descriptor empty of not? Empty descriptor could be created by setting "0" value in Pine. All the
+	 * properties of empty descriptor are null.
+	 * 
+	 * @return true if descriptor is not empty.
+	 */
 	public boolean isNotEmpty() {
 		return isNotEmpty;
-	}
-
-	public void setNotEmpty(boolean isNotEmpty) {
-		this.isNotEmpty = isNotEmpty;
 	}
 }
