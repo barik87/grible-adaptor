@@ -19,12 +19,15 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Class that represents Test Table entity from Pine.
  * 
  * @author Maksym Barvinskyi
- *
+ * 
  */
 public class TestTable {
 	private String tableName;
@@ -85,14 +88,18 @@ public class TestTable {
 	 * @return ArrayList of HashMap<ParameterName, ParameterValue>.
 	 */
 	public List<HashMap<String, String>> getGeneralTable() {
-		return getValuesFromDataCenter("table");
+		return getValuesFromPine("table");
 	}
 
 	List<HashMap<String, String>> getDataStorageValues() {
-		return getValuesFromDataCenter("storage");
+		return getValuesFromPine("storage");
 	}
 
-	private List<HashMap<String, String>> getValuesFromDataCenter(String entityType) {
+	HashMap<Integer, HashMap<String, String>> getDataStorageValues(Integer[] iterationNumbers) {
+		return getValuesFromPine(iterationNumbers);
+	}
+
+	private List<HashMap<String, String>> getValuesFromPine(String entityType) {
 		List<HashMap<String, String>> result = new ArrayList<HashMap<String, String>>();
 		try {
 			Connection conn = getConnection();
@@ -145,6 +152,54 @@ public class TestTable {
 		if (result.isEmpty()) {
 			String message = "Pine error: " + entityType + " '" + tableName + "' is missing.";
 			PineSettings.getErrorsHandler().onAdaptorFail(new Exception(message));
+		}
+		return result;
+	}
+
+	private HashMap<Integer, HashMap<String, String>> getValuesFromPine(Integer[] iterationNumbers) {
+		HashMap<Integer, HashMap<String, String>> result = new HashMap<Integer, HashMap<String, String>>();
+		try {
+			Connection conn = getConnection();
+			Statement stmt = conn.createStatement();
+
+			HashMap<Integer, String> keys = new HashMap<Integer, String>();
+			ResultSet rs = stmt.executeQuery("SELECT id, name FROM keys WHERE tableid="
+					+ "(SELECT id FROM tables WHERE classname='" + tableName + "' AND type="
+					+ "(SELECT id FROM tabletypes WHERE name='storage') AND categoryid IN "
+					+ "(SELECT id FROM categories WHERE productid=(SELECT id FROM products WHERE name='" + productName
+					+ "')))");
+			while (rs.next()) {
+				keys.put(rs.getInt("id"), rs.getString("name"));
+			}
+
+			HashMap<Integer, Integer> rowNumbersAndIds = new HashMap<Integer, Integer>();
+			rs = stmt.executeQuery("SELECT id, \"order\" FROM rows WHERE tableid="
+					+ "(SELECT id FROM tables WHERE classname='" + tableName
+					+ "' AND type=(SELECT id FROM tabletypes WHERE name='storage') AND categoryid IN "
+					+ "(SELECT id FROM categories WHERE productid=(SELECT id FROM products WHERE name='" + productName
+					+ "'))) AND \"order\" IN (" + StringUtils.join(iterationNumbers, ",") + ") ORDER BY \"order\"");
+			while (rs.next()) {
+				rowNumbersAndIds.put(rs.getInt("id"), rs.getInt("order"));
+			}
+
+			Set<Integer> rowIds = rowNumbersAndIds.keySet();
+			for (Integer rowId : rowIds) {
+				HashMap<String, String> row = new HashMap<String, String>();
+				rs = stmt.executeQuery("SELECT keyid, value FROM values WHERE rowid=" + rowId);
+				for (int j = 0; j < keys.size(); j++) {
+					while (rs.next()) {
+						String value = rs.getString("value").replace("\\", File.separator);
+						row.put(keys.get(rs.getInt("keyid")), value);
+					}
+				}
+				result.put(rowNumbersAndIds.get(rowId), row);
+			}
+
+			conn.close();
+			rs.close();
+			stmt.close();
+		} catch (SQLException e) {
+			PineSettings.getErrorsHandler().onAdaptorFail(e);
 		}
 		return result;
 	}

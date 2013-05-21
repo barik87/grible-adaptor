@@ -78,14 +78,12 @@ public class DataStorage {
 	public static <T> List<T> getDescriptors(Class<T> type, String indexes, boolean allowEmpty) {
 		List<T> result = new ArrayList<T>();
 		if (allowEmpty) {
-			int[] iterationNumbers = { 0 };
+			Integer[] iterationNumbers = { 0 };
 			if (indexes != null) {
 				iterationNumbers = getIntArrayFromString(indexes, ";");
 			}
-
 			TestTable dataStorage = new TestTable(type.getSimpleName());
-
-			List<HashMap<String, String>> rows = dataStorage.getDataStorageValues();
+			HashMap<Integer, HashMap<String, String>> rows = dataStorage.getDataStorageValues(iterationNumbers);
 			for (int i = 0; i < iterationNumbers.length; i++) {
 				T descriptor = null;
 				try {
@@ -94,7 +92,7 @@ public class DataStorage {
 						descriptor = c.newInstance(new Object[] { null });
 					} else {
 						Constructor<T> c = type.getConstructor(new Class[] { HashMap.class });
-						descriptor = c.newInstance(new Object[] { rows.get(iterationNumbers[i] - 1) });
+						descriptor = c.newInstance(new Object[] { rows.get(iterationNumbers[i]) });
 					}
 				} catch (Exception e) {
 					Exception pineException = new Exception("DataStorage exception: " + e.getMessage()
@@ -107,15 +105,14 @@ public class DataStorage {
 			}
 		} else {
 			if ((!("0").equals(indexes)) && (indexes != null)) {
-				int[] iterationNumbers = getIntArrayFromString(indexes, ";");
+				Integer[] iterationNumbers = getIntArrayFromString(indexes, ";");
 				TestTable dataStorage = new TestTable(type.getSimpleName());
-
-				List<HashMap<String, String>> rows = dataStorage.getDataStorageValues();
+				HashMap<Integer, HashMap<String, String>> rows = dataStorage.getDataStorageValues(iterationNumbers);
 				for (int i = 0; i < iterationNumbers.length; i++) {
 					T descriptor = null;
 					try {
 						Constructor<T> c = type.getConstructor(new Class[] { HashMap.class });
-						descriptor = c.newInstance(new Object[] { rows.get(iterationNumbers[i] - 1) });
+						descriptor = c.newInstance(new Object[] { rows.get(iterationNumbers[i]) });
 					} catch (Exception e) {
 						Exception pineException = new Exception("DataStorage exception: " + e.getMessage()
 								+ ". Happened during creating a descriptor: " + type.toString() + " # "
@@ -144,12 +141,12 @@ public class DataStorage {
 		return descriptors.get(0);
 	}
 
-	private static int[] getIntArrayFromString(String allElements, String delimiter) {
+	private static Integer[] getIntArrayFromString(String allElements, String delimiter) {
 		if (("").equals(allElements) || (allElements == null)) {
-			return new int[0];
+			return new Integer[0];
 		}
 		String[] tempArray = allElements.split(delimiter);
-		int[] resultArray = new int[tempArray.length];
+		Integer[] resultArray = new Integer[tempArray.length];
 		for (int i = 0; i < tempArray.length; i++) {
 			resultArray[i] = Integer.parseInt(tempArray[i]);
 		}
