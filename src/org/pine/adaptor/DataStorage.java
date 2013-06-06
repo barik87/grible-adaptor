@@ -133,8 +133,8 @@ public class DataStorage {
 	 * @param type
 	 *            - class of the descriptor (i.e. UserInfo.class);
 	 * @param index
-	 *            - row index of the descriptor to retrieve (i.e. "1", "5"); must be greater than 0;
-	 * @return ArrayList of the descriptor with specified row number found in the storage.
+	 *            - row index of the descriptor to retrieve (i.e. "1", "5"); if "0", returns an empty descriptor;
+	 * @return Descriptor for specified row number found in the storage or an empty (which all properties are null) descriptor.
 	 */
 	public static <T> T getDescriptor(Class<T> type, String index) {
 		List<T> descriptors = getDescriptors(type, index, true);
