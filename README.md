@@ -1,4 +1,4 @@
-pine-adaptor
+grible-adaptor
 ============
 
-Adaptor Pine library for Java automation frameworks.
+Adaptor Grible library for Java automation frameworks.
