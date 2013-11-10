@@ -1,4 +1,4 @@
-Pine adaptor library.
+Grible adaptor library.
 Copyright (C) 2013  Maksym Barvinskyi.
 
 This program is free software; you can redistribute it and/or

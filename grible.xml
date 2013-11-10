@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<configuration>
+	<gribledb>
+		<dbhost>localhost</dbhost>
+		<dbport>5432</dbport>
+		<dbname>grible</dbname>
+		<dblogin>postgres</dblogin>
+		<dbpswd>postgres</dbpswd>
+	</gribledb>
+</configuration>
