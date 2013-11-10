@@ -1,5 +1,9 @@
 *.class
 
+# IDE Files #
+/.settings
+*.classpath
+
 # Package Files #
 *.war
 *.ear
