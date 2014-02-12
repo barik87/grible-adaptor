@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Maksym Barvinskyi.
+ * Copyright (c) 2013 - 2014 Maksym Barvinskyi.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Public License v2.0
  * which accompanies this distribution, and is available at
@@ -26,8 +26,10 @@ import org.grible.adaptor.errors.SimpleErrorsHandler;
  * 
  */
 public class GribleSettings {
+	private static AppTypes appType;
 	private static ErrorsHandler errorsHandler;
 	private static String productName;
+	private static String productPath;
 	private static String dbhost;
 	private static String dbport;
 	private static String dbname;
@@ -46,6 +48,8 @@ public class GribleSettings {
 			Document doc = null;
 			doc = parser.build(new File(configFilePath));
 			if (doc != null) {
+				String strAppType = doc.getRootElement().getFirstChildElement("apptype").getValue().toUpperCase();
+				appType = AppTypes.valueOf(strAppType);
 				Element database = doc.getRootElement().getFirstChildElement("gribledb");
 				dbhost = database.getFirstChildElement("dbhost").getValue();
 				dbport = database.getFirstChildElement("dbport").getValue();
@@ -90,6 +94,22 @@ public class GribleSettings {
 	public static void setProductName(String productName) {
 		GribleSettings.productName = productName;
 	}
+	
+	/**
+	 * Gets the Product path that was set by setProductPath(String productPath).
+	 */
+	public static String getProductPath() {
+		return productPath;
+	}
+
+	/**
+	 * Sets the product path: it is relative to the root of the Java project (i.e. "data"). Not like in Grible.
+	 * 
+	 * @param productPath
+	 */
+	public static void setProductPath(String productPath) {
+		GribleSettings.productPath = productPath;
+	}
 
 	static String getDbHost() {
 		return dbhost;
@@ -109,6 +129,10 @@ public class GribleSettings {
 
 	static String getDbPswd() {
 		return dbpswd;
+	}
+
+	static AppTypes getAppType() {
+		return appType;
 	}
 
 }
