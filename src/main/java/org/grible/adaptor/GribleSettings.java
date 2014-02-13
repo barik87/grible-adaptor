@@ -48,8 +48,6 @@ public class GribleSettings {
 			Document doc = null;
 			doc = parser.build(new File(configFilePath));
 			if (doc != null) {
-				String strAppType = doc.getRootElement().getFirstChildElement("apptype").getValue().toUpperCase();
-				appType = AppTypes.valueOf(strAppType);
 				Element database = doc.getRootElement().getFirstChildElement("gribledb");
 				dbhost = database.getFirstChildElement("dbhost").getValue();
 				dbport = database.getFirstChildElement("dbport").getValue();
@@ -109,6 +107,15 @@ public class GribleSettings {
 	 */
 	public static void setProductPath(String productPath) {
 		GribleSettings.productPath = productPath;
+	}
+	
+	/**
+	 * Sets the grible app type: PostgreSQL or JSON.
+	 * 
+	 * @param appType
+	 */
+	public static void setAppType(AppTypes appType) {
+		GribleSettings.appType = appType;
 	}
 
 	static String getDbHost() {

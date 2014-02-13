@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <configuration>
-	<apptype>postgresql</apptype>
 	<gribledb>
 		<dbhost>localhost</dbhost>
 		<dbport>5432</dbport>
