@@ -1,7 +1,5 @@
 package org.grible.adaptor.json;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class TableJson {
 	private TableType type;
@@ -57,22 +55,6 @@ public class TableJson {
 
 	public void setValues(String[][] values) {
 		this.values = values;
-	}
-
-	public void setKeys(List<String> keyNames) {
-		this.keys = new KeyJson[keyNames.size()];
-		for (int i = 0; i < keys.length; i++) {
-			keys[i] = new KeyJson(keyNames.get(i), KeyType.TEXT, 0);
-		}
-	}
-
-	public void setValues(ArrayList<ArrayList<String>> valuesList) {
-		this.values = new String[valuesList.size()][valuesList.get(0).size()];
-		for (int i = 0; i < values.length; i++) {
-			for (int j = 0; j < values[i].length; j++) {
-				values[i][j] = valuesList.get(i).get(j);
-			}
-		}
 	}
 
 }
