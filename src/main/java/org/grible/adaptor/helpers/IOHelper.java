@@ -38,7 +38,7 @@ public class IOHelper {
 	public static File searchFileByClassName(File dir, String className) throws Exception {
 		for (File temp : dir.listFiles()) {
 			if (temp.isDirectory()) {
-				File result = searchFile(temp, className);
+				File result = searchFileByClassName(temp, className);
 				if (result != null) {
 					return result;
 				}
