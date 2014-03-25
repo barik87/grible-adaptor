@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <configuration>
+    <dbtype>POSTGRESQL</dbtype>
 	<gribledb>
 		<dbhost>localhost</dbhost>
 		<dbport>5432</dbport>
