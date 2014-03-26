@@ -73,7 +73,7 @@ public abstract class BaseDescriptor {
 	}
 
 	/**
-	 * Is the descriptor empty of not? Empty descriptor could be created by setting "0" value in Grible. All the
+	 * Is the descriptor empty or not? Empty descriptor could be created by setting "0" value in Grible. All the
 	 * properties of empty descriptor are null.
 	 * 
 	 * @return true if descriptor is not empty.
