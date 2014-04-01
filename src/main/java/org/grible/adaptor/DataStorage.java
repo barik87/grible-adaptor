@@ -114,11 +114,13 @@ public class DataStorage {
 	 *         empty (which all properties are null) descriptor.
 	 */
 	public static <T> T getDescriptor(Class<T> type, Integer index) {
-		return getDescriptors(type, String.valueOf(index)).get(0);
+		List<T> list = getDescriptors(type, String.valueOf(index));
+		return (list.isEmpty()) ? createEmptyDescriptor(type) : list.get(0);
 	}
 
 	public static <T> T getDescriptor(Class<T> type, String index) {
-		return getDescriptors(type, index).get(0);
+		List<T> list = getDescriptors(type, index);
+		return (list.isEmpty()) ? createEmptyDescriptor(type) : list.get(0);
 	}
 
 	private static <T> T createEmptyDescriptor(Class<T> type) {
