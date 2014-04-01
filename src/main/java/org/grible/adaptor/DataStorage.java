@@ -29,32 +29,6 @@ public class DataStorage {
 	private static Map<Class<?>, TreeMap<Integer, ?>> descriptors = new HashMap<Class<?>, TreeMap<Integer, ?>>();
 
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> getDescriptors(Class<T> type) {
-		createDescriptorsEntryWithEmptyDescriptor(type);
-
-		TreeMap<Integer, T> map = (TreeMap<Integer, T>) descriptors.get(type);
-
-		TestTable dataStorage = new TestTable(type.getSimpleName());
-		List<HashMap<String, String>> rows = dataStorage.getDataStorageValues();
-
-		for (int i = 0; i < rows.size(); i++) {
-			T descriptor = null;
-			try {
-				Constructor<T> c = type.getConstructor(new Class[] { HashMap.class });
-				descriptor = c.newInstance(new Object[] { rows.get(i) });
-			} catch (Exception e) {
-				Exception gribleException = new Exception("DataStorage exception: " + e.getMessage()
-						+ ". Happened during creating a descriptor: " + type.toString() + " # " + (i + 1));
-				gribleException.setStackTrace(e.getStackTrace());
-				GribleSettings.getErrorsHandler().onAdaptorFail(gribleException);
-			}
-			map.put(new Integer(i), descriptor);
-		}
-
-		return new ArrayList<T>(map.values());
-	}
-
-	@SuppressWarnings("unchecked")
 	public static <T> List<T> getDescriptors(Class<T> type, Integer[] indexes) {
 		List<T> result = new ArrayList<T>();
 		createDescriptorsEntryWithEmptyDescriptor(type);
@@ -86,6 +60,17 @@ public class DataStorage {
 		}
 
 		return result;
+	}
+	
+	public static <T> List<T> getDescriptors(Class<T> type) {
+		TestTable dataStorage = new TestTable(type.getSimpleName());
+		List<HashMap<String, String>> rows = dataStorage.getDataStorageValues();
+
+		Integer[] indexes = new Integer[rows.size()];
+		for (int i = 0; i < rows.size(); i++) {
+			indexes[i] = i + 1;
+		}
+		return getDescriptors(type, indexes);
 	}
 
 	private static <T> void createDescriptorsEntryWithEmptyDescriptor(Class<T> type) {
