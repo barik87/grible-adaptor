@@ -27,7 +27,7 @@ import java.util.TreeMap;
  */
 public class DataStorage {
 	private static Map<Class<?>, TreeMap<Integer, ?>> descriptors = new HashMap<Class<?>, TreeMap<Integer, ?>>();
-	
+
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> getDescriptors(Class<T> type) {
 		createDescriptorsEntryWithEmptyDescriptor(type);
@@ -38,25 +38,22 @@ public class DataStorage {
 		List<HashMap<String, String>> rows = dataStorage.getDataStorageValues();
 
 		for (int i = 0; i < rows.size(); i++) {
-			final int index = i + 1;
-			if (map.get(index) != null)	continue;
-			
 			T descriptor = null;
 			try {
 				Constructor<T> c = type.getConstructor(new Class[] { HashMap.class });
 				descriptor = c.newInstance(new Object[] { rows.get(i) });
 			} catch (Exception e) {
 				Exception gribleException = new Exception("DataStorage exception: " + e.getMessage()
-						+ ". Happened during creating a descriptor: " + type.toString() + " # " + index);
+						+ ". Happened during creating a descriptor: " + type.toString() + " # " + (i + 1));
 				gribleException.setStackTrace(e.getStackTrace());
 				GribleSettings.getErrorsHandler().onAdaptorFail(gribleException);
 			}
-			map.put(new Integer(index), descriptor);
+			map.put(new Integer(i), descriptor);
 		}
 
 		return new ArrayList<T>(map.values());
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> getDescriptors(Class<T> type, Integer[] indexes) {
 		List<T> result = new ArrayList<T>();
@@ -152,7 +149,7 @@ public class DataStorage {
 
 	private static Integer[] getIntArrayFromString(String allElements, String delimiter) {
 		if (("").equals(allElements) || (allElements == null)) {
-			return new Integer[]{0};
+			return new Integer[] { 0 };
 		}
 		String[] tempArray = allElements.split(delimiter);
 		Integer[] resultArray = new Integer[tempArray.length];
