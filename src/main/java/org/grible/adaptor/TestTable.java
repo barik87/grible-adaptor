@@ -19,12 +19,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.grible.adaptor.helpers.IOHelper;
-import org.grible.adaptor.json.KeyJson;
+import org.grible.adaptor.json.Key;
 import org.grible.adaptor.json.TableJson;
+
+import com.google.gson.Gson;
 
 /**
  * Class that represents Test Table entity from Grible.
@@ -71,19 +72,35 @@ public class TestTable {
 				Connection conn = getConnection();
 				Statement stmt = conn.createStatement();
 
-				ResultSet rs = stmt.executeQuery("SELECT k.name, v.value FROM keys as k JOIN values as v "
-						+ "ON v.keyid=k.id AND k.tableid =(SELECT id FROM tables WHERE type="
-						+ "(SELECT id FROM tabletypes WHERE name='" + subTableType + "') AND parentid="
-						+ "(SELECT id FROM tables WHERE name='" + tableName + "' AND categoryid IN "
-						+ "(SELECT id FROM categories WHERE productid=" + "(SELECT id FROM products WHERE name='"
-						+ productName + "') AND type=(SELECT id FROM tabletypes WHERE name='table'))))");
-				while (rs.next()) {
-					result.put(rs.getString("name"), rs.getString("value"));
+				String strKeys = null;
+				String strValues = null;
+
+				ResultSet rs = stmt.executeQuery("SELECT t.keys, t.values" + "FROM tables t "
+						+ "INNER JOIN tabletypes tt ON t.type = tt.id " + "INNER JOIN tables pt ON t.parentid=pt.id "
+						+ "INNER JOIN categories c ON pt.categoryid=c.id "
+						+ "INNER JOIN products p ON c.productid=p.id "
+						+ "INNER JOIN tabletypes ctt ON c.type = ctt.id " + "WHERE tt.name='" + subTableType
+						+ "' AND pt.name='" + tableName + "' AND p.name='" + productName + "' AND ctt.name='table'");
+				if (rs.next()) {
+					strKeys = rs.getString("keys");
+					strValues = rs.getString("values");
 				}
 
 				conn.close();
 				rs.close();
 				stmt.close();
+
+				if (strKeys != null && strValues != null) {
+					Gson gson = new Gson();
+					Key[] keys = gson.fromJson(strKeys, Key[].class);
+					String[][] values = gson.fromJson(strValues, String[][].class);
+					for (int j = 0; j < values[0].length; j++) {
+						result.put(keys[j].getName(), values[0][j].replace("\\", File.separator));
+					}
+				} else {
+					throw new Exception(StringUtils.capitalize(subTableType) + "s in the table '" + tableName
+							+ "' of product '" + productName + "' not found.");
+				}
 			} else {
 				String fileName = tableName + "_" + subTableType.toUpperCase() + ".json";
 				File file = IOHelper.searchFile(new File(productPath + File.separator + "TestTables"), fileName);
@@ -92,7 +109,7 @@ public class TestTable {
 							+ new File(productPath + File.separator + "TestTables").getAbsolutePath() + "'.");
 				}
 				TableJson tableJson = IOHelper.parseTableJson(file);
-				KeyJson[] keys = tableJson.getKeys();
+				Key[] keys = tableJson.getKeys();
 				String[][] values = tableJson.getValues();
 				for (int j = 0; j < values[0].length; j++) {
 					result.put(keys[j].getName(), values[0][j].replace("\\", File.separator));
@@ -135,35 +152,34 @@ public class TestTable {
 					nameColumn = "classname";
 				}
 
-				HashMap<Integer, String> keys = new HashMap<Integer, String>();
-				ResultSet rs = stmt.executeQuery("SELECT id, name FROM keys WHERE tableid="
-						+ "(SELECT id FROM tables WHERE " + nameColumn + "='" + tableName + "' AND type="
-						+ "(SELECT id FROM tabletypes WHERE name='" + entityType + "') AND categoryid IN "
-						+ "(SELECT id FROM categories WHERE productid=(SELECT id FROM products WHERE name='"
-						+ productName + "')))");
-				while (rs.next()) {
-					keys.put(rs.getInt("id"), rs.getString("name"));
+				String strKeys = null;
+				String strValues = null;
+
+				ResultSet rs = stmt.executeQuery("SELECT t.keys, t.values " + "FROM tables t "
+						+ "INNER JOIN tabletypes tt ON t.type = tt.id "
+						+ "INNER JOIN categories c ON t.categoryid=c.id "
+						+ "INNER JOIN products p ON c.productid=p.id "
+						+ "INNER JOIN tabletypes ctt ON c.type = ctt.id " + "WHERE tt.name='" + entityType + "' AND t."
+						+ nameColumn + "='" + tableName + "' AND p.name='" + productName + "'");
+				if (rs.next()) {
+					strKeys = rs.getString("keys");
+					strValues = rs.getString("values");
 				}
 
-				List<Integer> rowIds = new ArrayList<Integer>();
-				rs = stmt.executeQuery("SELECT id FROM rows WHERE tableid=" + "(SELECT id FROM tables WHERE "
-						+ nameColumn + "='" + tableName + "' AND type=" + "(SELECT id FROM tabletypes WHERE name='"
-						+ entityType + "') AND categoryid IN " + "(SELECT id FROM categories WHERE productid="
-						+ "(SELECT id FROM products WHERE name='" + productName + "'))) ORDER BY \"order\"");
-				while (rs.next()) {
-					rowIds.add(rs.getInt("id"));
-				}
-
-				for (int i = 0; i < rowIds.size(); i++) {
-					HashMap<String, String> row = new HashMap<String, String>();
-					rs = stmt.executeQuery("SELECT keyid, value FROM values WHERE rowid=" + rowIds.get(i));
-					for (int j = 0; j < keys.size(); j++) {
-						while (rs.next()) {
-							String value = rs.getString("value").replace("\\", File.separator);
-							row.put(keys.get(rs.getInt("keyid")), value);
+				if (strKeys != null && strValues != null) {
+					Gson gson = new Gson();
+					Key[] keys = gson.fromJson(strKeys, Key[].class);
+					String[][] values = gson.fromJson(strValues, String[][].class);
+					for (int i = 0; i < values.length; i++) {
+						HashMap<String, String> row = new HashMap<String, String>();
+						for (int j = 0; j < values[0].length; j++) {
+							row.put(keys[j].getName(), values[i][j].replace("\\", File.separator));
 						}
+						result.add(row);
 					}
-					result.add(row);
+				} else {
+					throw new Exception(StringUtils.capitalize(entityType) + " with name '" + tableName
+							+ "' not found in product '" + productName + "'.");
 				}
 
 				conn.close();
@@ -183,7 +199,8 @@ public class TestTable {
 				} else {
 					String className = tableName;
 					String sectionDir = "DataStorages";
-					file = IOHelper.searchFileByClassName(new File(productPath + File.separator + sectionDir), className);
+					file = IOHelper.searchFileByClassName(new File(productPath + File.separator + sectionDir),
+							className);
 					if (file == null) {
 						throw new Exception("File with class name '" + className + "' not found in directory '"
 								+ new File(productPath + File.separator + sectionDir).getAbsolutePath() + "'.");
@@ -191,7 +208,7 @@ public class TestTable {
 				}
 
 				TableJson tableJson = IOHelper.parseTableJson(file);
-				KeyJson[] keys = tableJson.getKeys();
+				Key[] keys = tableJson.getKeys();
 				String[][] values = tableJson.getValues();
 				for (int i = 0; i < values.length; i++) {
 					HashMap<String, String> row = new HashMap<String, String>();
@@ -218,38 +235,34 @@ public class TestTable {
 				Connection conn = getConnection();
 				Statement stmt = conn.createStatement();
 
-				HashMap<Integer, String> keys = new HashMap<Integer, String>();
-				ResultSet rs = stmt.executeQuery("SELECT id, name FROM keys WHERE tableid="
-						+ "(SELECT id FROM tables WHERE classname='" + tableName + "' AND type="
-						+ "(SELECT id FROM tabletypes WHERE name='storage') AND categoryid IN "
-						+ "(SELECT id FROM categories WHERE productid=(SELECT id FROM products WHERE name='"
-						+ productName + "')))");
-				while (rs.next()) {
-					keys.put(rs.getInt("id"), rs.getString("name"));
+				String strKeys = null;
+				String strValues = null;
+
+				ResultSet rs = stmt.executeQuery("SELECT t.keys, t.values " + "FROM tables t "
+						+ "INNER JOIN tabletypes tt ON t.type = tt.id "
+						+ "INNER JOIN categories c ON t.categoryid=c.id "
+						+ "INNER JOIN products p ON c.productid=p.id "
+						+ "INNER JOIN tabletypes ctt ON c.type = ctt.id " + "WHERE tt.name='storage' AND t.classname='"
+						+ tableName + "' AND p.name='" + productName + "'");
+				if (rs.next()) {
+					strKeys = rs.getString("keys");
+					strValues = rs.getString("values");
 				}
 
-				HashMap<Integer, Integer> rowNumbersAndIds = new HashMap<Integer, Integer>();
-				rs = stmt.executeQuery("SELECT id, \"order\" FROM rows WHERE tableid="
-						+ "(SELECT id FROM tables WHERE classname='" + tableName
-						+ "' AND type=(SELECT id FROM tabletypes WHERE name='storage') AND categoryid IN "
-						+ "(SELECT id FROM categories WHERE productid=(SELECT id FROM products WHERE name='"
-						+ productName + "'))) AND \"order\" IN (" + StringUtils.join(iterationNumbers, ",")
-						+ ") ORDER BY \"order\"");
-				while (rs.next()) {
-					rowNumbersAndIds.put(rs.getInt("id"), rs.getInt("order"));
-				}
-
-				Set<Integer> rowIds = rowNumbersAndIds.keySet();
-				for (Integer rowId : rowIds) {
-					HashMap<String, String> row = new HashMap<String, String>();
-					rs = stmt.executeQuery("SELECT keyid, value FROM values WHERE rowid=" + rowId);
-					for (int j = 0; j < keys.size(); j++) {
-						while (rs.next()) {
-							String value = rs.getString("value").replace("\\", File.separator);
-							row.put(keys.get(rs.getInt("keyid")), value);
+				if (strKeys != null && strValues != null) {
+					Gson gson = new Gson();
+					Key[] keys = gson.fromJson(strKeys, Key[].class);
+					String[][] values = gson.fromJson(strValues, String[][].class);
+					for (int i = 0; i < iterationNumbers.length; i++) {
+						HashMap<String, String> row = new HashMap<String, String>();
+						for (int j = 0; j < values[0].length; j++) {
+							row.put(keys[j].getName(), values[iterationNumbers[i] - 1][j].replace("\\", File.separator));
 						}
+						result.put(iterationNumbers[i], row);
 					}
-					result.put(rowNumbersAndIds.get(rowId), row);
+				} else {
+					throw new Exception("Storage with name '" + tableName + "' not found in product '" + productName
+							+ "'.");
 				}
 
 				conn.close();
@@ -259,13 +272,14 @@ public class TestTable {
 				String className = tableName;
 				String sectionDir = "DataStorages";
 
-				File file = IOHelper.searchFileByClassName(new File(productPath + File.separator + sectionDir), className);
+				File file = IOHelper.searchFileByClassName(new File(productPath + File.separator + sectionDir),
+						className);
 				if (file == null) {
 					throw new Exception("File with class name '" + className + "' not found in directory '"
 							+ new File(productPath + File.separator + sectionDir).getAbsolutePath() + "'.");
 				}
 				TableJson tableJson = IOHelper.parseTableJson(file);
-				KeyJson[] keys = tableJson.getKeys();
+				Key[] keys = tableJson.getKeys();
 				String[][] values = tableJson.getValues();
 				for (int i = 0; i < iterationNumbers.length; i++) {
 					HashMap<String, String> row = new HashMap<String, String>();

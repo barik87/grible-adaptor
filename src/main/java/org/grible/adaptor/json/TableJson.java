@@ -6,7 +6,7 @@ public class TableJson {
 	private String className;
 	private boolean showUsage;
 	private boolean showWarning;
-	private KeyJson[] keys;
+	private Key[] keys;
 	private String[][] values;
 
 	public TableType getType() {
@@ -41,11 +41,11 @@ public class TableJson {
 		this.showWarning = showWarning;
 	}
 
-	public KeyJson[] getKeys() {
+	public Key[] getKeys() {
 		return keys;
 	}
 
-	public void setKeys(KeyJson[] keys) {
+	public void setKeys(Key[] keys) {
 		this.keys = keys;
 	}
 

@@ -1,6 +1,6 @@
 package org.grible.adaptor.json;
 
-public class KeyJson {
+public class Key {
 	private String name;
 	private String type;
 	private int refid;
