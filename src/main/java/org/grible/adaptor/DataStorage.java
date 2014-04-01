@@ -31,6 +31,9 @@ public class DataStorage {
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> getDescriptors(Class<T> type, Integer[] indexes) {
 		List<T> result = new ArrayList<T>();
+		if (indexes[0] == 0) {
+			return result;
+		}
 		createDescriptorsEntryWithEmptyDescriptor(type);
 
 		TreeMap<Integer, T> map = (TreeMap<Integer, T>) descriptors.get(type);
