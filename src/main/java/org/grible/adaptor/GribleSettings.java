@@ -54,7 +54,6 @@ public class GribleSettings {
 				dbname = database.getFirstChildElement("dbname").getValue();
 				dblogin = database.getFirstChildElement("dblogin").getValue();
 				dbpswd = database.getFirstChildElement("dbpswd").getValue();
-				appType = AppTypes.valueOf(doc.getRootElement().getFirstChildElement("dbtype").getValue());
 			}
 		} catch (Exception e) {
 			getErrorsHandler().onAdaptorFail(e);
