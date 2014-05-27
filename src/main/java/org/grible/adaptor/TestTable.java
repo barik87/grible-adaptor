@@ -75,7 +75,7 @@ public class TestTable {
 				String strKeys = null;
 				String strValues = null;
 
-				ResultSet rs = stmt.executeQuery("SELECT t.keys, t.values" + "FROM tables t "
+				ResultSet rs = stmt.executeQuery("SELECT t.keys, t.values " + "FROM tables t "
 						+ "INNER JOIN tabletypes tt ON t.type = tt.id " + "INNER JOIN tables pt ON t.parentid=pt.id "
 						+ "INNER JOIN categories c ON pt.categoryid=c.id "
 						+ "INNER JOIN products p ON c.productid=p.id "
